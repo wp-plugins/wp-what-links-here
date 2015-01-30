@@ -3,7 +3,7 @@
  * Plugin Name: WP What Links Here
  * Plugin URI: http://wordpress.org/plugins/wp-what-links-here/
  * Description: This plugin implements "what links here" functionality in WordPress, like seen on e.g. Wikipedia.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Peter J. Herrel
  * Author URI: http://peterherrel.com/
  * License: GPL3
@@ -35,7 +35,7 @@
  * @author     Peter J. Herrel <peterherrel@gmail.com>
  * @copyright  Copyright 2014 Peter J. Herrel
  * @license    http://www.gnu.org/licenses/gpl.txt GPL3
- * @link       http://wordpress.org/plugins/wp-what-links-here/
+ * @link       https://wordpress.org/plugins/wp-what-links-here/
  * @link       https://github.com/diggy/wp-what-links-here/wiki/
  * @link       http://peterherrel.com/wordpress/plugins/wp-what-links-here/
  * @since      1.0.1
@@ -56,8 +56,7 @@ if( ! class_exists( 'Wp_Wlh' ) )
  */
 class Wp_Wlh
 {
-    var $version    = '1.0.1';
-    var $post_types = '';
+    var $version    = '1.0.2';
 
     /**
      * Constructor.
@@ -68,9 +67,6 @@ class Wp_Wlh
      */
     protected function __construct()
     {
-        // allowed post types
-        $this->post_types = apply_filters( 'wp_wlh_post_types', array_keys( get_post_types( array( 'public' => true ), 'names' ) ) );
-
         // define cron interval, default: 7200 seconds = every two hours
         if( ! defined( 'WP_WLH_CRON_INTERVAL' ) ) define( 'WP_WLH_CRON_INTERVAL', 7200 );
 
@@ -401,7 +397,7 @@ class Wp_Wlh
             return $html;
 
         $query = new WP_Query( apply_filters( 'wp_wlh_shortcode_query_args', array(
-             'post_type'        => $this->post_types
+             'post_type'        => $this->post_types()
             ,'post_status'      => array( 'publish' )
             ,'post__in'         => $post__in
             ,'posts_per_page'   => -1
@@ -535,6 +531,18 @@ class Wp_Wlh
     /* retrieval methods **************************************************************************/
 
     /**
+     * Get allowed post types
+     *
+     * @since   1.0.2
+     * @access  public
+     * @return  void
+     */
+    public function post_types()
+    {
+        return apply_filters( 'wp_wlh_post_types', array_keys( get_post_types( array( 'public' => true ), 'names' ) ) );
+    }
+
+    /**
      * Get what's linking here.
      *
      * @since   1.0.1
@@ -630,7 +638,7 @@ class Wp_Wlh
             return false;
 
         // check post type
-        if( ! in_array( $post->post_type, array_values( $this->post_types ) ) )
+        if( ! in_array( $post->post_type, array_values( $this->post_types() ) ) )
             return false;
 
         return $post;
@@ -805,6 +813,7 @@ class Wp_Wlh
         if( $file === plugin_basename( __FILE__ ) )
         {
             $links[] = sprintf( '<a target="_blank" href="%s">%s</a>', esc_url( 'https://github.com/diggy/wp-what-links-here/wiki/' ), __( 'Wiki', 'wp_wlh' ) );
+            $links[] = sprintf( '<a target="_blank" href="%s">%s</a>', esc_url( 'https://wordpress.org/support/plugin/wp-what-links-here' ), __( 'Support', 'wp_wlh' ) );
             $links[] = sprintf( '<a target="_blank" href="%s">%s</a>', esc_url( 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BULEF95ABJC4Y' ), __( 'Donate', 'wp_wlh' ) );
         }
 
